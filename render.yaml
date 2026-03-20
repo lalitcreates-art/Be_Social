@@ -18,7 +18,8 @@ services:
       - key: UPLOAD_DIR
         value: uploads
 
-  - type: static_site
+  - type: web
+    runtime: static
     name: be-social-web
     rootDir: .
     buildCommand: npm install && npm run build --workspace client
