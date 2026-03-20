@@ -1,0 +1,32 @@
+services:
+  - type: web
+    name: be-social-api
+    runtime: node
+    plan: free
+    rootDir: .
+    buildCommand: npm install
+    startCommand: npm run start --workspace server
+    envVars:
+      - key: NODE_VERSION
+        value: 20.10.0
+      - key: CLIENT_URL
+        sync: false
+      - key: MONGODB_URI
+        sync: false
+      - key: JWT_SECRET
+        sync: false
+      - key: UPLOAD_DIR
+        value: uploads
+
+  - type: static_site
+    name: be-social-web
+    rootDir: .
+    buildCommand: npm install && npm run build --workspace client
+    staticPublishPath: ./client/dist
+    envVars:
+      - key: VITE_API_URL
+        sync: false
+      - key: VITE_SOCKET_URL
+        sync: false
+      - key: VITE_ASSET_URL
+        sync: false
