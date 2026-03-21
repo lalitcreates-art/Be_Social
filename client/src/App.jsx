@@ -22,6 +22,7 @@ export default function App() {
         <Route path="/" element={<FeedPage />} />
         <Route path="/messages" element={<MessagesPage />} />
         <Route path="/profile" element={<ProfilePage />} />
+        <Route path="/profile/:userId" element={<ProfilePage />} />
       </Route>
     </Routes>
   );

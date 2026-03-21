@@ -1,8 +1,12 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { api } from "../lib/api.js";
 import { getSocket } from "../lib/socket.js";
+import { useAuth } from "../context/AuthContext.jsx";
 
 export function MessagesPage() {
+  const { user } = useAuth();
+  const navigate = useNavigate();
   const [conversations, setConversations] = useState([]);
   const [people, setPeople] = useState([]);
   const [active, setActive] = useState(null);
@@ -57,16 +61,36 @@ export function MessagesPage() {
     setActive(response.conversation);
   }
 
+  function openProfile(personId) {
+    navigate(personId === user?.id ? "/profile" : `/profile/${personId}`);
+  }
+
   return (
     <section className="messages-layout">
       <aside className="card conversation-list">
         <p className="eyebrow">Chats</p>
         {conversations.map((conversation) => (
           <button key={conversation.id} className="conversation-row" onClick={() => setActive(conversation)}>
-            <div className="avatar-shell">{conversation.partner.initials}</div>
+            <div
+              className="avatar-shell profile-trigger"
+              onClick={(event) => {
+                event.stopPropagation();
+                openProfile(conversation.partner.id);
+              }}
+            >
+              {conversation.partner.avatarUrl ? <img src={conversation.partner.avatarUrl} alt={`${conversation.partner.name} profile`} /> : conversation.partner.initials}
+            </div>
             <div>
-              <strong>{conversation.partner.name}</strong>
-              <p>{conversation.lastMessage || conversation.partner.headline}</p>
+              <strong
+                className="profile-trigger"
+                onClick={(event) => {
+                  event.stopPropagation();
+                  openProfile(conversation.partner.id);
+                }}
+              >
+                {conversation.partner.name}
+              </strong>
+              <p>{conversation.lastMessage || "Tap to chat"}</p>
             </div>
           </button>
         ))}
@@ -74,10 +98,26 @@ export function MessagesPage() {
           <p className="eyebrow">Start a new chat</p>
           {people.map((person) => (
             <button key={person.id} className="conversation-row" onClick={() => startConversation(person.id)}>
-              <div className="avatar-shell">{person.initials}</div>
+              <div
+                className="avatar-shell profile-trigger"
+                onClick={(event) => {
+                  event.stopPropagation();
+                  openProfile(person.id);
+                }}
+              >
+                {person.avatarUrl ? <img src={person.avatarUrl} alt={`${person.name} profile`} /> : person.initials}
+              </div>
               <div>
-                <strong>{person.name}</strong>
-                <p>{person.headline}</p>
+                <strong
+                  className="profile-trigger"
+                  onClick={(event) => {
+                    event.stopPropagation();
+                    openProfile(person.id);
+                  }}
+                >
+                  {person.name}
+                </strong>
+                <p>Start a conversation</p>
               </div>
             </button>
           ))}

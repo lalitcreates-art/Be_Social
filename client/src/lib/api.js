@@ -45,7 +45,8 @@ export const api = {
   },
   users: {
     suggestions: () => request("/users/suggestions"),
-    updateMe: (payload) => request("/users/me", { method: "PUT", body: JSON.stringify(payload) })
+    updateMe: (payload) => request("/users/me", { method: "PUT", body: JSON.stringify(payload) }),
+    getById: (userId) => request(`/users/${userId}`)
   },
   messages: {
     conversations: () => request("/messages/conversations"),

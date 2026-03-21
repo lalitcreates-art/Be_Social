@@ -1,6 +1,9 @@
 import { useRef, useState } from "react";
+import { Link } from "react-router-dom";
+import { useAuth } from "../context/AuthContext.jsx";
 
 export function PostCard({ post, onLike, onComment, onDelete }) {
+  const { user } = useAuth();
   const [comment, setComment] = useState("");
   const [activeImageIndex, setActiveImageIndex] = useState(0);
   const [viewerOpen, setViewerOpen] = useState(false);
@@ -9,6 +12,8 @@ export function PostCard({ post, onLike, onComment, onDelete }) {
   const rawImages = Array.isArray(post.imageUrls) && post.imageUrls.length ? post.imageUrls : post.imageUrl ? [post.imageUrl] : [];
   const images = rawImages.map((imageUrl) => (imageUrl.startsWith("data:") ? imageUrl : `${import.meta.env.VITE_ASSET_URL || "http://localhost:5000"}${imageUrl}`));
   const activeImage = images[activeImageIndex] || "";
+  const authorAvatarUrl = post.author.id === user?.id && user?.avatarUrl ? user.avatarUrl : post.author.avatarUrl;
+  const profilePath = post.author.id === user?.id ? "/profile" : `/profile/${post.author.id}`;
 
   async function submitComment(event) {
     event.preventDefault();
@@ -53,10 +58,15 @@ export function PostCard({ post, onLike, onComment, onDelete }) {
   return (
     <article className="card post-card">
       <div className="post-head">
-        <div className="avatar-shell">{post.author.initials}</div>
-        <div>
-          <strong>{post.author.name}</strong>
-          <p>{post.author.headline}</p>
+        <Link className="user-link" to={profilePath}>
+          <div className="avatar-shell">
+            {authorAvatarUrl ? <img src={authorAvatarUrl} alt={`${post.author.name} profile`} /> : post.author.initials}
+          </div>
+        </Link>
+        <div className="post-head-copy">
+          <Link className="user-link post-author-link" to={profilePath}>
+            <strong>{post.author.name}</strong>
+          </Link>
         </div>
       </div>
       <p className="post-copy">{post.content}</p>
