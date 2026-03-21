@@ -1,9 +1,11 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 
 export function PostCard({ post, onLike, onComment, onDelete }) {
   const [comment, setComment] = useState("");
   const [activeImageIndex, setActiveImageIndex] = useState(0);
   const [viewerOpen, setViewerOpen] = useState(false);
+  const touchStartX = useRef(0);
+  const touchMoved = useRef(false);
   const rawImages = Array.isArray(post.imageUrls) && post.imageUrls.length ? post.imageUrls : post.imageUrl ? [post.imageUrl] : [];
   const images = rawImages.map((imageUrl) => (imageUrl.startsWith("data:") ? imageUrl : `${import.meta.env.VITE_ASSET_URL || "http://localhost:5000"}${imageUrl}`));
   const activeImage = images[activeImageIndex] || "";
@@ -21,6 +23,33 @@ export function PostCard({ post, onLike, onComment, onDelete }) {
     setActiveImageIndex((nextIndex + total) % total);
   }
 
+  function handleTouchStart(event) {
+    touchStartX.current = event.touches[0]?.clientX || 0;
+    touchMoved.current = false;
+  }
+
+  function handleTouchEnd(event) {
+    const endX = event.changedTouches[0]?.clientX || 0;
+    const deltaX = endX - touchStartX.current;
+
+    if (Math.abs(deltaX) < 35) {
+      touchMoved.current = false;
+      return;
+    }
+
+    touchMoved.current = true;
+    if (deltaX < 0) goToImage(activeImageIndex + 1);
+    else goToImage(activeImageIndex - 1);
+  }
+
+  function openViewer() {
+    if (touchMoved.current) {
+      touchMoved.current = false;
+      return;
+    }
+    setViewerOpen(true);
+  }
+
   return (
     <article className="card post-card">
       <div className="post-head">
@@ -33,7 +62,13 @@ export function PostCard({ post, onLike, onComment, onDelete }) {
       <p className="post-copy">{post.content}</p>
       {images.length ? (
         <div className="carousel">
-          <button className="carousel-image-button" type="button" onClick={() => setViewerOpen(true)}>
+          <button
+            className="carousel-image-button"
+            type="button"
+            onClick={openViewer}
+            onTouchStart={handleTouchStart}
+            onTouchEnd={handleTouchEnd}
+          >
             <img className="post-image" src={activeImage} alt={`Post image ${activeImageIndex + 1}`} />
           </button>
           {images.length > 1 ? (
@@ -85,7 +120,7 @@ export function PostCard({ post, onLike, onComment, onDelete }) {
                 Close
               </button>
             </div>
-            <div className="image-viewer-stage">
+            <div className="image-viewer-stage" onTouchStart={handleTouchStart} onTouchEnd={handleTouchEnd}>
               <img className="image-viewer-image" src={activeImage} alt={`Fullscreen image ${activeImageIndex + 1}`} />
             </div>
             {images.length > 1 ? (
