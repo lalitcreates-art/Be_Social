@@ -128,7 +128,10 @@ export function MessagesPage() {
         <h2>{active?.partner.name || "Select a chat"}</h2>
         <div className="message-stack">
           {messages.map((message) => (
-            <div key={message.id} className="message-bubble">
+            <div
+              key={message.id}
+              className={message.sender.id === user?.id ? "message-bubble message-bubble-own" : "message-bubble message-bubble-other"}
+            >
               <strong>{message.sender.name}</strong>
               <p>{message.text}</p>
             </div>

@@ -449,6 +449,20 @@ img {
   overflow: auto;
 }
 
+.message-bubble-own {
+  justify-self: end;
+  width: min(100%, 78%);
+  background: linear-gradient(135deg, rgba(15, 90, 70, 0.18), rgba(15, 90, 70, 0.08));
+  border: 1px solid rgba(15, 90, 70, 0.12);
+}
+
+.message-bubble-other {
+  justify-self: start;
+  width: min(100%, 78%);
+  background: rgba(249, 214, 107, 0.18);
+  border: 1px solid rgba(249, 214, 107, 0.24);
+}
+
 .profile-grid {
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
