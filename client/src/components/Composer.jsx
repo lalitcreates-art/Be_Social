@@ -2,47 +2,54 @@ import { useState } from "react";
 
 export function Composer({ onSubmit, busy }) {
   const [content, setContent] = useState("");
-  const [file, setFile] = useState(null);
-  const [previewUrl, setPreviewUrl] = useState("");
+  const [files, setFiles] = useState([]);
+  const [previewUrls, setPreviewUrls] = useState([]);
 
   async function handleSubmit(event) {
     event.preventDefault();
-    if (!content.trim() && !file) return;
-    await onSubmit({ content, file });
+    if (!content.trim() && !files.length) return;
+    await onSubmit({ content, files });
     setContent("");
-    setFile(null);
-    setPreviewUrl("");
+    setFiles([]);
+    setPreviewUrls([]);
     event.target.reset();
   }
 
   function handleFileChange(event) {
-    const nextFile = event.target.files?.[0] || null;
-    setFile(nextFile);
-    setPreviewUrl(nextFile ? URL.createObjectURL(nextFile) : "");
+    const nextFiles = Array.from(event.target.files || []).slice(0, 5);
+    setFiles(nextFiles);
+    setPreviewUrls(nextFiles.map((file) => URL.createObjectURL(file)));
   }
 
   return (
     <form className="card composer" onSubmit={handleSubmit}>
       <textarea value={content} onChange={(event) => setContent(event.target.value)} placeholder="Share what's happening on Be Social" rows={4} />
-      {previewUrl ? (
+      {previewUrls.length ? (
         <div className="composer-preview">
-          <img src={previewUrl} alt="Post preview" className="post-image" />
-          <button
-            className="ghost-button"
-            type="button"
-            onClick={() => {
-              setFile(null);
-              setPreviewUrl("");
-            }}
-          >
-            Remove photo
-          </button>
+          <div className="composer-preview-grid">
+            {previewUrls.map((previewUrl, index) => (
+              <img key={`${previewUrl}-${index}`} src={previewUrl} alt={`Post preview ${index + 1}`} className="composer-thumb" />
+            ))}
+          </div>
+          <div className="composer-preview-actions">
+            <span>{previewUrls.length} of 5 photos selected</span>
+            <button
+              className="ghost-button"
+              type="button"
+              onClick={() => {
+                setFiles([]);
+                setPreviewUrls([]);
+              }}
+            >
+              Remove photos
+            </button>
+          </div>
         </div>
       ) : null}
       <div className="composer-actions">
         <label className="chip-button">
-          Add photo
-          <input type="file" accept="image/*" hidden onChange={handleFileChange} />
+          Add up to 5 photos
+          <input type="file" accept="image/*" multiple hidden onChange={handleFileChange} />
         </label>
         <button className="primary-button" type="submit" disabled={busy}>
           {busy ? "Posting..." : "Post"}

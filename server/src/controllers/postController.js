@@ -2,11 +2,13 @@ import asyncHandler from "express-async-handler";
 import { Post } from "../models/Post.js";
 
 function mapPost(post, currentUserId) {
+  const imageUrls = Array.isArray(post.imageUrls) && post.imageUrls.length ? post.imageUrls : post.imageUrl ? [post.imageUrl] : [];
   return {
     id: post._id.toString(),
     authorId: post.author._id.toString(),
     content: post.content,
     imageUrl: post.imageUrl,
+    imageUrls,
     createdAt: post.createdAt,
     likesCount: post.likes.length,
     likedByMe: post.likes.some((userId) => userId.toString() === currentUserId),
@@ -33,11 +35,13 @@ function mapPost(post, currentUserId) {
 }
 
 function mapSharedPost(post) {
+  const imageUrls = Array.isArray(post.imageUrls) && post.imageUrls.length ? post.imageUrls : post.imageUrl ? [post.imageUrl] : [];
   return {
     id: post._id.toString(),
     authorId: post.author._id.toString(),
     content: post.content,
     imageUrl: post.imageUrl,
+    imageUrls,
     createdAt: post.createdAt,
     likesCount: post.likes.length,
     author: {
@@ -72,9 +76,9 @@ export const getFeed = asyncHandler(async (req, res) => {
 
 export const createPost = asyncHandler(async (req, res) => {
   const content = (req.body.content || "").trim();
-  const imageUrl = req.body.imageUrl || "";
+  const imageUrls = Array.isArray(req.body.imageUrls) ? req.body.imageUrls.filter(Boolean).slice(0, 5) : req.body.imageUrl ? [req.body.imageUrl] : [];
 
-  if (!content && !imageUrl) {
+  if (!content && !imageUrls.length) {
     res.status(400);
     throw new Error("Post content or image is required");
   }
@@ -82,7 +86,8 @@ export const createPost = asyncHandler(async (req, res) => {
   const post = await Post.create({
     author: req.user._id,
     content,
-    imageUrl
+    imageUrl: imageUrls[0] || "",
+    imageUrls
   });
 
   const hydrated = await Post.findById(post._id)

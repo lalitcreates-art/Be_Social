@@ -64,15 +64,19 @@ export function FeedPage() {
     };
   }, [user]);
 
-  async function handleCreate({ content, file }) {
+  async function handleCreate({ content, files }) {
     setBusy(true);
     try {
-      let imageUrl = "";
-      if (file) {
-        const upload = await api.uploads.image(file);
-        imageUrl = upload.imageUrl;
+      let imageUrls = [];
+      if (files?.length) {
+        imageUrls = await Promise.all(
+          files.map(async (selectedFile) => {
+            const upload = await api.uploads.image(selectedFile);
+            return upload.imageUrl;
+          })
+        );
       }
-      const response = await api.posts.create({ content, imageUrl });
+      const response = await api.posts.create({ content, imageUrls });
       setPosts((current) => (current.some((item) => item.id === response.post.id) ? current : [response.post, ...current]));
     } finally {
       setBusy(false);

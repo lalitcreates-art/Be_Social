@@ -13,6 +13,7 @@ const postSchema = new mongoose.Schema(
     author: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
     content: { type: String, default: "", trim: true },
     imageUrl: { type: String, default: "" },
+    imageUrls: [{ type: String }],
     likes: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
     comments: [commentSchema]
   },
