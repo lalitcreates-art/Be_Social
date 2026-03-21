@@ -207,8 +207,6 @@ img {
 
 .feed-column,
 .feed-stack,
-.side-column,
-.suggestion-list,
 .message-stack,
 .profile-grid {
   display: grid;
@@ -301,16 +299,7 @@ img {
 }
 
 .profile-grid {
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-}
-
-.stat-card {
-  text-align: center;
-}
-
-.stat-card strong {
-  display: block;
-  font-size: 2rem;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
 .bottom-nav {
@@ -350,7 +339,7 @@ img {
 
 @media (min-width: 900px) {
   .content-grid {
-    grid-template-columns: minmax(0, 1fr) 320px;
+    grid-template-columns: minmax(0, 1fr);
     align-items: start;
   }
 

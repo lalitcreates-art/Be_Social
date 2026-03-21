@@ -9,9 +9,9 @@ export function Shell() {
   const navigate = useNavigate();
 
   const titles = {
-    "/": { title: "Be Social", subtitle: "Your network, simplified" },
+    "/": { title: "Be Social", subtitle: "Feed, chat, and profile" },
     "/messages": { title: "Messages", subtitle: "Direct conversations" },
-    "/profile": { title: "Profile", subtitle: "Your public presence" }
+    "/profile": { title: "Profile", subtitle: "Your personal details" }
   };
 
   const current = titles[location.pathname] || titles["/"];

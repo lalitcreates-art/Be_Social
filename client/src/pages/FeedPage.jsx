@@ -8,13 +8,11 @@ import { getSocket } from "../lib/socket.js";
 export function FeedPage() {
   const { user } = useAuth();
   const [posts, setPosts] = useState([]);
-  const [people, setPeople] = useState([]);
   const [busy, setBusy] = useState(false);
 
   async function load() {
-    const [feed, suggestions] = await Promise.all([api.posts.list(), api.users.suggestions()]);
+    const feed = await api.posts.list();
     setPosts(feed.posts);
-    setPeople(suggestions.users);
   }
 
   useEffect(() => {
@@ -97,36 +95,17 @@ export function FeedPage() {
   }
 
   return (
-    <>
-      <section className="feed-column">
-        <div className="hero-card">
-          <p className="eyebrow">Mobile-first community</p>
-          <h2>Be Social feels natural on Android and scales to the desktop.</h2>
-        </div>
-        <Composer onSubmit={handleCreate} busy={busy} />
-        <div className="feed-stack">
-          {posts.map((post) => (
-            <PostCard key={post.id} post={post} onLike={handleLike} onComment={handleComment} onDelete={handleDelete} />
-          ))}
-        </div>
-      </section>
-      <aside className="side-column">
-        <section className="card">
-          <p className="eyebrow">Suggested people</p>
-          <h3>Grow your network</h3>
-          <div className="suggestion-list">
-            {people.map((person) => (
-              <div key={person.id} className="person-row">
-                <div className="avatar-shell">{person.initials}</div>
-                <div>
-                  <strong>{person.name}</strong>
-                  <p>{person.headline}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </section>
-      </aside>
-    </>
+    <section className="feed-column">
+      <div className="hero-card">
+        <p className="eyebrow">Private social space</p>
+        <h2>A simple place for your family and friends to post, chat, and stay connected.</h2>
+      </div>
+      <Composer onSubmit={handleCreate} busy={busy} />
+      <div className="feed-stack">
+        {posts.map((post) => (
+          <PostCard key={post.id} post={post} onLike={handleLike} onComment={handleComment} onDelete={handleDelete} />
+        ))}
+      </div>
+    </section>
   );
 }

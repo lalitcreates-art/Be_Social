@@ -50,14 +50,6 @@ export function ProfilePage() {
           <h3>Bio</h3>
           <p>{user?.bio}</p>
         </article>
-        <article className="card stat-card">
-          <strong>{user?.followersCount ?? 0}</strong>
-          <span>Followers</span>
-        </article>
-        <article className="card stat-card">
-          <strong>{user?.followingCount ?? 0}</strong>
-          <span>Following</span>
-        </article>
       </div>
     </section>
   );
