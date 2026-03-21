@@ -14,6 +14,7 @@ export function PostCard({ post, onLike, onComment, onDelete }) {
   const activeImage = images[activeImageIndex] || "";
   const authorAvatarUrl = post.author.id === user?.id && user?.avatarUrl ? user.avatarUrl : post.author.avatarUrl;
   const profilePath = post.author.id === user?.id ? "/profile" : `/profile/${post.author.id}`;
+  const videoUrl = post.videoUrl?.startsWith("data:") || !post.videoUrl ? post.videoUrl : `${import.meta.env.VITE_ASSET_URL || "http://localhost:5000"}${post.videoUrl}`;
 
   async function submitComment(event) {
     event.preventDefault();
@@ -55,6 +56,19 @@ export function PostCard({ post, onLike, onComment, onDelete }) {
     setViewerOpen(true);
   }
 
+  function renderLinkedText(text) {
+    const parts = text.split(/(https?:\/\/[^\s]+)/g);
+    return parts.map((part, index) =>
+      /^https?:\/\//.test(part) ? (
+        <a key={`${part}-${index}`} href={part} target="_blank" rel="noreferrer" className="post-link">
+          {part}
+        </a>
+      ) : (
+        <span key={`${part}-${index}`}>{part}</span>
+      )
+    );
+  }
+
   return (
     <article className="card post-card">
       <div className="post-head">
@@ -69,7 +83,8 @@ export function PostCard({ post, onLike, onComment, onDelete }) {
           </Link>
         </div>
       </div>
-      <p className="post-copy">{post.content}</p>
+      <p className="post-copy">{renderLinkedText(post.content)}</p>
+      {videoUrl ? <video className="post-video" src={videoUrl} controls playsInline preload="metadata" /> : null}
       {images.length ? (
         <div className="carousel">
           <button

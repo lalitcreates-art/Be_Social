@@ -14,6 +14,7 @@ const postSchema = new mongoose.Schema(
     content: { type: String, default: "", trim: true },
     imageUrl: { type: String, default: "" },
     imageUrls: [{ type: String }],
+    videoUrl: { type: String, default: "" },
     likes: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
     comments: [commentSchema]
   },

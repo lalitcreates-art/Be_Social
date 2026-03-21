@@ -9,6 +9,7 @@ function mapPost(post, currentUserId) {
     content: post.content,
     imageUrl: post.imageUrl,
     imageUrls,
+    videoUrl: post.videoUrl || "",
     createdAt: post.createdAt,
     likesCount: post.likes.length,
     likedByMe: post.likes.some((userId) => userId.toString() === currentUserId),
@@ -42,6 +43,7 @@ function mapSharedPost(post) {
     content: post.content,
     imageUrl: post.imageUrl,
     imageUrls,
+    videoUrl: post.videoUrl || "",
     createdAt: post.createdAt,
     likesCount: post.likes.length,
     author: {
@@ -77,17 +79,19 @@ export const getFeed = asyncHandler(async (req, res) => {
 export const createPost = asyncHandler(async (req, res) => {
   const content = (req.body.content || "").trim();
   const imageUrls = Array.isArray(req.body.imageUrls) ? req.body.imageUrls.filter(Boolean).slice(0, 5) : req.body.imageUrl ? [req.body.imageUrl] : [];
+  const videoUrl = typeof req.body.videoUrl === "string" ? req.body.videoUrl : "";
 
-  if (!content && !imageUrls.length) {
+  if (!content && !imageUrls.length && !videoUrl) {
     res.status(400);
-    throw new Error("Post content or image is required");
+    throw new Error("Post content, image, or video is required");
   }
 
   const post = await Post.create({
     author: req.user._id,
     content,
     imageUrl: imageUrls[0] || "",
-    imageUrls
+    imageUrls,
+    videoUrl
   });
 
   const hydrated = await Post.findById(post._id)

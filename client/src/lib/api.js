@@ -41,6 +41,11 @@ export const api = {
       const formData = new FormData();
       formData.append("image", file);
       return request("/uploads/image", { method: "POST", body: formData });
+    },
+    media: (file) => {
+      const formData = new FormData();
+      formData.append("media", file);
+      return request("/uploads/media", { method: "POST", body: formData });
     }
   },
   users: {

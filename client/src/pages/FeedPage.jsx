@@ -68,15 +68,22 @@ export function FeedPage() {
     setBusy(true);
     try {
       let imageUrls = [];
+      let videoUrl = "";
       if (files?.length) {
-        imageUrls = await Promise.all(
-          files.map(async (selectedFile) => {
-            const upload = await api.uploads.image(selectedFile);
-            return upload.imageUrl;
-          })
-        );
+        const hasVideo = files.some((selectedFile) => selectedFile.type.startsWith("video/"));
+        if (hasVideo) {
+          const upload = await api.uploads.media(files[0]);
+          videoUrl = upload.mediaUrl;
+        } else {
+          imageUrls = await Promise.all(
+            files.map(async (selectedFile) => {
+              const upload = await api.uploads.media(selectedFile);
+              return upload.mediaUrl;
+            })
+          );
+        }
       }
-      const response = await api.posts.create({ content, imageUrls });
+      const response = await api.posts.create({ content, imageUrls, videoUrl });
       setPosts((current) => (current.some((item) => item.id === response.post.id) ? current : [response.post, ...current]));
     } finally {
       setBusy(false);
