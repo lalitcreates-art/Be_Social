@@ -4,7 +4,6 @@ export function PostCard({ post, onLike, onComment, onDelete }) {
   const [comment, setComment] = useState("");
   const [activeImageIndex, setActiveImageIndex] = useState(0);
   const [viewerOpen, setViewerOpen] = useState(false);
-  const [zoom, setZoom] = useState(1);
   const rawImages = Array.isArray(post.imageUrls) && post.imageUrls.length ? post.imageUrls : post.imageUrl ? [post.imageUrl] : [];
   const images = rawImages.map((imageUrl) => (imageUrl.startsWith("data:") ? imageUrl : `${import.meta.env.VITE_ASSET_URL || "http://localhost:5000"}${imageUrl}`));
   const activeImage = images[activeImageIndex] || "";
@@ -20,7 +19,6 @@ export function PostCard({ post, onLike, onComment, onDelete }) {
     const total = images.length;
     if (!total) return;
     setActiveImageIndex((nextIndex + total) % total);
-    setZoom(1);
   }
 
   return (
@@ -39,29 +37,15 @@ export function PostCard({ post, onLike, onComment, onDelete }) {
             <img className="post-image" src={activeImage} alt={`Post image ${activeImageIndex + 1}`} />
           </button>
           {images.length > 1 ? (
-            <div className="carousel-controls">
-              <button className="secondary-button" type="button" onClick={() => goToImage(activeImageIndex - 1)}>
-                Prev
-              </button>
-              <span>
-                {activeImageIndex + 1} / {images.length}
-              </span>
-              <button className="secondary-button" type="button" onClick={() => goToImage(activeImageIndex + 1)}>
-                Next
-              </button>
-            </div>
-          ) : null}
-          {images.length > 1 ? (
-            <div className="carousel-thumbs">
+            <div className="carousel-dots" role="tablist" aria-label="Image carousel">
               {images.map((imageSrc, index) => (
                 <button
                   key={`${imageSrc}-${index}`}
-                  className={index === activeImageIndex ? "carousel-thumb is-active" : "carousel-thumb"}
+                  className={index === activeImageIndex ? "carousel-dot is-active" : "carousel-dot"}
                   type="button"
                   onClick={() => goToImage(index)}
-                >
-                  <img src={imageSrc} alt={`Thumbnail ${index + 1}`} />
-                </button>
+                  aria-label={`Show image ${index + 1}`}
+                />
               ))}
             </div>
           ) : null}
@@ -96,36 +80,25 @@ export function PostCard({ post, onLike, onComment, onDelete }) {
         <div className="image-viewer" onClick={() => setViewerOpen(false)}>
           <div className="image-viewer-panel" onClick={(event) => event.stopPropagation()}>
             <div className="image-viewer-toolbar">
-              <button className="secondary-button" type="button" onClick={() => setZoom((current) => Math.max(1, current - 0.25))}>
-                Zoom out
-              </button>
-              <span>{Math.round(zoom * 100)}%</span>
-              <button className="secondary-button" type="button" onClick={() => setZoom((current) => Math.min(3, current + 0.25))}>
-                Zoom in
-              </button>
+              <span>Pinch to zoom</span>
               <button className="secondary-button" type="button" onClick={() => setViewerOpen(false)}>
                 Close
               </button>
             </div>
             <div className="image-viewer-stage">
-              <img
-                className="image-viewer-image"
-                src={activeImage}
-                alt={`Fullscreen image ${activeImageIndex + 1}`}
-                style={{ transform: `scale(${zoom})` }}
-              />
+              <img className="image-viewer-image" src={activeImage} alt={`Fullscreen image ${activeImageIndex + 1}`} />
             </div>
             {images.length > 1 ? (
-              <div className="carousel-controls">
-                <button className="secondary-button" type="button" onClick={() => goToImage(activeImageIndex - 1)}>
-                  Prev
-                </button>
-                <span>
-                  {activeImageIndex + 1} / {images.length}
-                </span>
-                <button className="secondary-button" type="button" onClick={() => goToImage(activeImageIndex + 1)}>
-                  Next
-                </button>
+              <div className="carousel-dots" role="tablist" aria-label="Fullscreen image carousel">
+                {images.map((imageSrc, index) => (
+                  <button
+                    key={`${imageSrc}-${index}-viewer`}
+                    className={index === activeImageIndex ? "carousel-dot is-active" : "carousel-dot"}
+                    type="button"
+                    onClick={() => goToImage(index)}
+                    aria-label={`Show image ${index + 1}`}
+                  />
+                ))}
               </div>
             ) : null}
           </div>
