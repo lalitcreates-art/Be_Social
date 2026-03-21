@@ -8,5 +8,5 @@ export const upload = multer({
     if (imageTypes.has(file.mimetype)) cb(null, true);
     else cb(new Error("Only JPEG, PNG, and WEBP images are allowed"));
   },
-  limits: { fileSize: 2 * 1024 * 1024 }
+  limits: { fileSize: 8 * 1024 * 1024 }
 });
