@@ -2,6 +2,7 @@ import { useState } from "react";
 
 export function PostCard({ post, onLike, onComment, onDelete }) {
   const [comment, setComment] = useState("");
+  const imageSrc = post.imageUrl.startsWith("data:") ? post.imageUrl : `${import.meta.env.VITE_ASSET_URL || "http://localhost:5000"}${post.imageUrl}`;
 
   async function submitComment(event) {
     event.preventDefault();
@@ -20,7 +21,7 @@ export function PostCard({ post, onLike, onComment, onDelete }) {
         </div>
       </div>
       <p className="post-copy">{post.content}</p>
-      {post.imageUrl ? <img className="post-image" src={`${import.meta.env.VITE_ASSET_URL || "http://localhost:5000"}${post.imageUrl}`} alt="" /> : null}
+      {post.imageUrl ? <img className="post-image" src={imageSrc} alt="" /> : null}
       <div className="post-stats">
         <span>{post.likesCount} likes</span>
         <span>{post.comments.length} comments</span>
