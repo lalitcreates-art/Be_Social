@@ -1,10 +1,12 @@
 import { useEffect, useState } from "react";
 import { Composer } from "../components/Composer.jsx";
 import { PostCard } from "../components/PostCard.jsx";
+import { useAuth } from "../context/AuthContext.jsx";
 import { api } from "../lib/api.js";
 import { getSocket } from "../lib/socket.js";
 
 export function FeedPage() {
+  const { user } = useAuth();
   const [posts, setPosts] = useState([]);
   const [people, setPeople] = useState([]);
   const [busy, setBusy] = useState(false);
@@ -24,12 +26,29 @@ export function FeedPage() {
     const socket = getSocket(token);
     if (!socket) return;
 
+    const mergeSharedPost = (incomingPost) => ({
+      ...incomingPost,
+      canDelete: incomingPost.authorId === user?.id,
+      likedByMe: false
+    });
+
     const onNew = ({ post }) => {
-      setPosts((current) => (current.some((item) => item.id === post.id) ? current : [post, ...current]));
+      setPosts((current) => (current.some((item) => item.id === post.id) ? current : [mergeSharedPost(post), ...current]));
     };
 
     const onUpdate = ({ post }) => {
-      setPosts((current) => current.map((item) => (item.id === post.id ? post : item)));
+      setPosts((current) =>
+        current.map((item) =>
+          item.id === post.id
+            ? {
+                ...item,
+                ...post,
+                canDelete: post.authorId === user?.id,
+                likedByMe: item.likedByMe
+              }
+            : item
+        )
+      );
     };
 
     const onDelete = ({ postId }) => {
@@ -45,7 +64,7 @@ export function FeedPage() {
       socket.off("post:update", onUpdate);
       socket.off("post:delete", onDelete);
     };
-  }, []);
+  }, [user]);
 
   async function handleCreate({ content, file }) {
     setBusy(true);

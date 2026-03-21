@@ -32,6 +32,35 @@ function mapPost(post, currentUserId) {
   };
 }
 
+function mapSharedPost(post) {
+  return {
+    id: post._id.toString(),
+    authorId: post.author._id.toString(),
+    content: post.content,
+    imageUrl: post.imageUrl,
+    createdAt: post.createdAt,
+    likesCount: post.likes.length,
+    author: {
+      id: post.author._id.toString(),
+      name: post.author.name,
+      headline: post.author.headline,
+      avatarUrl: post.author.avatarUrl,
+      initials: post.author.name.split(/\s+/).slice(0, 2).map((part) => part[0]?.toUpperCase() || "").join("")
+    },
+    comments: post.comments.map((comment) => ({
+      id: comment._id.toString(),
+      text: comment.text,
+      createdAt: comment.createdAt,
+      author: {
+        id: comment.author._id.toString(),
+        name: comment.author.name,
+        avatarUrl: comment.author.avatarUrl,
+        initials: comment.author.name.split(/\s+/).slice(0, 2).map((part) => part[0]?.toUpperCase() || "").join("")
+      }
+    }))
+  };
+}
+
 export const getFeed = asyncHandler(async (req, res) => {
   const posts = await Post.find()
     .sort({ createdAt: -1 })
@@ -61,7 +90,7 @@ export const createPost = asyncHandler(async (req, res) => {
     .populate("comments.author", "name avatarUrl");
 
   const payload = mapPost(hydrated, req.user._id.toString());
-  req.app.get("io").emit("post:new", { post: payload });
+  req.app.get("io").emit("post:new", { post: mapSharedPost(hydrated) });
   res.status(201).json({ post: payload });
 });
 
@@ -83,7 +112,7 @@ export const toggleLike = asyncHandler(async (req, res) => {
 
   await post.save();
   const payload = mapPost(post, currentUserId);
-  req.app.get("io").emit("post:update", { post: payload });
+  req.app.get("io").emit("post:update", { post: mapSharedPost(post) });
   res.json({ post: payload });
 });
 
@@ -103,7 +132,7 @@ export const addComment = asyncHandler(async (req, res) => {
     .populate("comments.author", "name avatarUrl");
 
   const payload = mapPost(hydrated, req.user._id.toString());
-  req.app.get("io").emit("post:update", { post: payload });
+  req.app.get("io").emit("post:update", { post: mapSharedPost(hydrated) });
   res.status(201).json({ post: payload });
 });
 
