@@ -14,9 +14,27 @@ import { errorHandler, notFound } from "./middleware/error.js";
 
 export function createApp() {
   const app = express();
+  const allowedOrigins = new Set([
+    env.clientUrl,
+    "http://localhost",
+    "https://localhost",
+    "capacitor://localhost"
+  ]);
 
   app.use(helmet({ crossOriginResourcePolicy: { policy: "cross-origin" } }));
-  app.use(cors({ origin: env.clientUrl, credentials: true }));
+  app.use(
+    cors({
+      origin: (origin, callback) => {
+        if (!origin || allowedOrigins.has(origin)) {
+          callback(null, true);
+          return;
+        }
+
+        callback(new Error(`Origin not allowed by CORS: ${origin}`));
+      },
+      credentials: true
+    })
+  );
   app.use(express.json({ limit: "2mb" }));
   app.use(express.urlencoded({ extended: true }));
   app.use(cookieParser());
