@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-export function PostCard({ post, onLike, onComment }) {
+export function PostCard({ post, onLike, onComment, onDelete }) {
   const [comment, setComment] = useState("");
 
   async function submitComment(event) {
@@ -29,6 +29,11 @@ export function PostCard({ post, onLike, onComment }) {
         <button className={post.likedByMe ? "secondary-button active" : "secondary-button"} onClick={() => onLike(post.id)}>
           {post.likedByMe ? "Liked" : "Like"}
         </button>
+        {post.canDelete ? (
+          <button className="secondary-button" onClick={() => onDelete(post.id)}>
+            Delete
+          </button>
+        ) : null}
       </div>
       <div className="comment-list">
         {post.comments.map((item) => (

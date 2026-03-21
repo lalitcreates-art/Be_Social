@@ -15,6 +15,22 @@ router.get(
   })
 );
 
+router.put(
+  "/me",
+  asyncHandler(async (req, res) => {
+    const { name, headline, bio, avatarUrl, coverUrl } = req.body;
+
+    if (typeof name === "string" && name.trim()) req.user.name = name.trim();
+    if (typeof headline === "string") req.user.headline = headline.trim();
+    if (typeof bio === "string") req.user.bio = bio.trim();
+    if (typeof avatarUrl === "string") req.user.avatarUrl = avatarUrl;
+    if (typeof coverUrl === "string") req.user.coverUrl = coverUrl;
+
+    await req.user.save();
+    res.json({ user: req.user.toSafeObject() });
+  })
+);
+
 router.get(
   "/:id",
   asyncHandler(async (req, res) => {

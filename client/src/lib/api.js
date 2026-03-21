@@ -32,6 +32,7 @@ export const api = {
   posts: {
     list: () => request("/posts"),
     create: (payload) => request("/posts", { method: "POST", body: JSON.stringify(payload) }),
+    remove: (postId) => request(`/posts/${postId}`, { method: "DELETE" }),
     like: (postId) => request(`/posts/${postId}/like`, { method: "POST" }),
     comment: (postId, payload) => request(`/posts/${postId}/comments`, { method: "POST", body: JSON.stringify(payload) })
   },
@@ -43,7 +44,8 @@ export const api = {
     }
   },
   users: {
-    suggestions: () => request("/users/suggestions")
+    suggestions: () => request("/users/suggestions"),
+    updateMe: (payload) => request("/users/me", { method: "PUT", body: JSON.stringify(payload) })
   },
   messages: {
     conversations: () => request("/messages/conversations"),

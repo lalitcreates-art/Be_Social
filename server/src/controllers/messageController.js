@@ -48,6 +48,12 @@ export const createConversation = asyncHandler(async (req, res) => {
 });
 
 export const getMessages = asyncHandler(async (req, res) => {
+  const conversation = await Conversation.findById(req.params.conversationId);
+  if (!conversation || !conversation.members.some((memberId) => memberId.toString() === req.user._id.toString())) {
+    res.status(404);
+    throw new Error("Conversation not found");
+  }
+
   const messages = await Message.find({ conversation: req.params.conversationId })
     .sort({ createdAt: 1 })
     .populate("sender", "name avatarUrl");
@@ -70,7 +76,7 @@ export const getMessages = asyncHandler(async (req, res) => {
 
 export const sendMessage = asyncHandler(async (req, res) => {
   const conversation = await Conversation.findById(req.params.conversationId);
-  if (!conversation) {
+  if (!conversation || !conversation.members.some((memberId) => memberId.toString() === req.user._id.toString())) {
     res.status(404);
     throw new Error("Conversation not found");
   }

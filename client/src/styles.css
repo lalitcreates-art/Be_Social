@@ -77,7 +77,10 @@ img {
 .auth-form,
 .comment-form,
 .message-form,
-.composer {
+.composer,
+.profile-form,
+.composer-preview,
+.conversation-suggestions {
   display: grid;
   gap: 14px;
 }
@@ -85,7 +88,9 @@ img {
 .auth-form input,
 .comment-form input,
 .message-form input,
-.composer textarea {
+.composer textarea,
+.profile-form input,
+.profile-form textarea {
   width: 100%;
   border: 1px solid var(--line);
   border-radius: 18px;
@@ -277,6 +282,10 @@ img {
 .message-thread,
 .conversation-list {
   min-height: 70vh;
+}
+
+.conversation-list {
+  align-content: start;
 }
 
 .message-thread {

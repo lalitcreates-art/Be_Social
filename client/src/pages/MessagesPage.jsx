@@ -4,14 +4,16 @@ import { getSocket } from "../lib/socket.js";
 
 export function MessagesPage() {
   const [conversations, setConversations] = useState([]);
+  const [people, setPeople] = useState([]);
   const [active, setActive] = useState(null);
   const [messages, setMessages] = useState([]);
   const [text, setText] = useState("");
 
   useEffect(() => {
-    api.messages.conversations().then((data) => {
-      setConversations(data.conversations);
-      if (data.conversations[0]) setActive(data.conversations[0]);
+    Promise.all([api.messages.conversations(), api.users.suggestions()]).then(([conversationData, peopleData]) => {
+      setConversations(conversationData.conversations);
+      setPeople(peopleData.users);
+      if (conversationData.conversations[0]) setActive(conversationData.conversations[0]);
     });
   }, []);
 
@@ -28,7 +30,7 @@ export function MessagesPage() {
     socket.emit("conversation:join", active.id);
     const onMessage = (payload) => {
       if (payload.conversationId === active.id) {
-        setMessages((current) => [...current, payload.message]);
+        setMessages((current) => (current.some((item) => item.id === payload.message.id) ? current : [...current, payload.message]));
       }
     };
 
@@ -42,8 +44,17 @@ export function MessagesPage() {
     event.preventDefault();
     if (!active || !text.trim()) return;
     const response = await api.messages.send(active.id, { text });
-    setMessages((current) => [...current, response.message]);
+    setMessages((current) => (current.some((item) => item.id === response.message.id) ? current : [...current, response.message]));
     setText("");
+  }
+
+  async function startConversation(partnerId) {
+    const response = await api.messages.createConversation({ partnerId });
+    setConversations((current) => {
+      const exists = current.find((item) => item.id === response.conversation.id);
+      return exists ? current : [response.conversation, ...current];
+    });
+    setActive(response.conversation);
   }
 
   return (
@@ -59,6 +70,18 @@ export function MessagesPage() {
             </div>
           </button>
         ))}
+        <div className="conversation-suggestions">
+          <p className="eyebrow">Start a new chat</p>
+          {people.map((person) => (
+            <button key={person.id} className="conversation-row" onClick={() => startConversation(person.id)}>
+              <div className="avatar-shell">{person.initials}</div>
+              <div>
+                <strong>{person.name}</strong>
+                <p>{person.headline}</p>
+              </div>
+            </button>
+          ))}
+        </div>
       </aside>
       <section className="card message-thread">
         <p className="eyebrow">Conversation</p>

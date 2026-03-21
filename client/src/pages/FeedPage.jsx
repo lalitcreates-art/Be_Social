@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Composer } from "../components/Composer.jsx";
 import { PostCard } from "../components/PostCard.jsx";
 import { api } from "../lib/api.js";
+import { getSocket } from "../lib/socket.js";
 
 export function FeedPage() {
   const [posts, setPosts] = useState([]);
@@ -18,6 +19,34 @@ export function FeedPage() {
     load().catch(console.error);
   }, []);
 
+  useEffect(() => {
+    const token = localStorage.getItem("be-social-token");
+    const socket = getSocket(token);
+    if (!socket) return;
+
+    const onNew = ({ post }) => {
+      setPosts((current) => (current.some((item) => item.id === post.id) ? current : [post, ...current]));
+    };
+
+    const onUpdate = ({ post }) => {
+      setPosts((current) => current.map((item) => (item.id === post.id ? post : item)));
+    };
+
+    const onDelete = ({ postId }) => {
+      setPosts((current) => current.filter((item) => item.id !== postId));
+    };
+
+    socket.on("post:new", onNew);
+    socket.on("post:update", onUpdate);
+    socket.on("post:delete", onDelete);
+
+    return () => {
+      socket.off("post:new", onNew);
+      socket.off("post:update", onUpdate);
+      socket.off("post:delete", onDelete);
+    };
+  }, []);
+
   async function handleCreate({ content, file }) {
     setBusy(true);
     try {
@@ -27,7 +56,7 @@ export function FeedPage() {
         imageUrl = upload.imageUrl;
       }
       const response = await api.posts.create({ content, imageUrl });
-      setPosts((current) => [response.post, ...current]);
+      setPosts((current) => (current.some((item) => item.id === response.post.id) ? current : [response.post, ...current]));
     } finally {
       setBusy(false);
     }
@@ -43,6 +72,11 @@ export function FeedPage() {
     setPosts((current) => current.map((post) => (post.id === postId ? response.post : post)));
   }
 
+  async function handleDelete(postId) {
+    await api.posts.remove(postId);
+    setPosts((current) => current.filter((post) => post.id !== postId));
+  }
+
   return (
     <>
       <section className="feed-column">
@@ -53,7 +87,7 @@ export function FeedPage() {
         <Composer onSubmit={handleCreate} busy={busy} />
         <div className="feed-stack">
           {posts.map((post) => (
-            <PostCard key={post.id} post={post} onLike={handleLike} onComment={handleComment} />
+            <PostCard key={post.id} post={post} onLike={handleLike} onComment={handleComment} onDelete={handleDelete} />
           ))}
         </div>
       </section>
