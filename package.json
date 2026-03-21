@@ -11,9 +11,18 @@
     "dev:client": "npm run dev --workspace client",
     "dev:server": "npm run dev --workspace server",
     "build": "npm run build --workspace client",
-    "start": "npm run start --workspace server"
+    "start": "npm run start --workspace server",
+    "android:build:web": "npm run build --workspace client",
+    "android:sync": "npm run android:build:web && npx cap sync android",
+    "android:open": "npx cap open android"
   },
   "devDependencies": {
-    "concurrently": "^9.0.1"
+    "@capacitor/cli": "^7.4.3",
+    "concurrently": "^9.0.1",
+    "typescript": "^5.8.3"
+  },
+  "dependencies": {
+    "@capacitor/android": "^7.4.3",
+    "@capacitor/core": "^7.4.3"
   }
 }

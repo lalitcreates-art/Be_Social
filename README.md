@@ -63,6 +63,31 @@ Frontend environment variables:
 - Free Render web services can sleep when idle, so the first API request may be slow.
 - Uploaded images are stored on the backend filesystem. On free hosting, this storage is not durable. For production, move uploads to Cloudinary, S3, or similar object storage.
 
+## Android app build
+
+This project is prepared for Android packaging with Capacitor.
+
+### Commands
+
+- `npm install`
+- `npm run android:sync`
+- `npm run android:open`
+
+### Requirements to generate an APK
+
+- Java JDK installed
+- Android Studio installed
+- Android SDK configured
+
+### APK generation flow
+
+1. Run `npm run android:sync`
+2. Run `npm run android:open`
+3. In Android Studio, wait for Gradle sync
+4. Use `Build` -> `Build Bundle(s) / APK(s)` -> `Build APK(s)`
+
+The Android wrapper uses the deployed backend URLs already configured in your frontend environment.
+
 ## Features
 
 - Be Social branding across the app
