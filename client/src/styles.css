@@ -193,6 +193,25 @@ img {
   font-weight: 700;
 }
 
+.user-pill span {
+  flex-shrink: 0;
+}
+
+.avatar-shell {
+  overflow: hidden;
+}
+
+.avatar-shell img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.avatar-shell.tiny {
+  width: 42px;
+  height: 42px;
+}
+
 .avatar-shell.large {
   width: 76px;
   height: 76px;
@@ -216,7 +235,8 @@ img {
 .composer-preview-grid,
 .image-viewer-toolbar,
 .carousel-dots,
-.composer-preview-actions {
+.composer-preview-actions,
+.profile-upload {
   display: flex;
   align-items: center;
   gap: 10px;
@@ -428,11 +448,6 @@ img {
   .content-grid {
     grid-template-columns: minmax(0, 1fr);
     align-items: start;
-  }
-
-  .bottom-nav {
-    position: static;
-    margin-top: 16px;
   }
 }
 

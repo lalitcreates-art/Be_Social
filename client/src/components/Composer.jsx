@@ -25,7 +25,7 @@ export function Composer({ onSubmit, busy }) {
 
   return (
     <form className="card composer" onSubmit={handleSubmit}>
-      <textarea value={content} onChange={(event) => setContent(event.target.value)} placeholder="Share what's happening on Be Social" rows={4} />
+      <textarea value={content} onChange={(event) => setContent(event.target.value)} placeholder="What you want to share ?" rows={4} />
       {previewUrls.length ? (
         <div className="composer-preview">
           <div className="composer-preview-grid">

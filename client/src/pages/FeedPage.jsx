@@ -100,10 +100,6 @@ export function FeedPage() {
 
   return (
     <section className="feed-column">
-      <div className="hero-card">
-        <p className="eyebrow">Private social space</p>
-        <h2>A simple place for your family and friends to post, chat, and stay connected.</h2>
-      </div>
       <Composer onSubmit={handleCreate} busy={busy} />
       <div className="feed-stack">
         {posts.map((post) => (

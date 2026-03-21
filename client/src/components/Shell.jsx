@@ -9,7 +9,7 @@ export function Shell() {
   const navigate = useNavigate();
 
   const titles = {
-    "/": { title: "Be Social", subtitle: "Feed, chat, and profile" },
+    "/": { title: "Be Social", subtitle: "" },
     "/messages": { title: "Messages", subtitle: "Direct conversations" },
     "/profile": { title: "Profile", subtitle: "Your personal details" }
   };
@@ -24,7 +24,9 @@ export function Shell() {
         actions={
           <>
             <div className="user-pill">
-              <span>{user?.initials || "BS"}</span>
+              <span className="avatar-shell tiny">
+                {user?.avatarUrl ? <img src={user.avatarUrl} alt={`${user.name} profile`} /> : user?.initials || "BS"}
+              </span>
               <strong>{user?.name}</strong>
             </div>
             <button
