@@ -16,9 +16,11 @@ export function Composer({ onSubmit, busy }) {
   }
 
   function handleFileChange(event) {
-    const nextFiles = Array.from(event.target.files || []).slice(0, 5);
-    setFiles(nextFiles);
-    setPreviewUrls(nextFiles.map((file) => URL.createObjectURL(file)));
+    const selectedFiles = Array.from(event.target.files || []);
+    const combinedFiles = [...files, ...selectedFiles].slice(0, 5);
+    setFiles(combinedFiles);
+    setPreviewUrls(combinedFiles.map((file) => URL.createObjectURL(file)));
+    event.target.value = "";
   }
 
   return (
